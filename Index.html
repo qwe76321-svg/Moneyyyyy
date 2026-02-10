@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全球市場即時連動監控</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f1f3f6; margin: 0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 15px; overflow: hidden; }
+        .card-title { font-weight: bold; margin-bottom: 10px; color: #333; border-left: 4px solid #2962FF; padding-left: 10px; }
+        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>全球市場連動監控儀表板</h1>
+    <p>即時監測美股走勢、台積電 ADR 與台幣匯率</p>
+</div>
+
+<div class="grid-container">
+    <div class="card">
+        <div class="card-title">台股加權指數 (TWII)</div>
+        <div class="tradingview-widget-container">
+            <div id="tv-twn"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+            <script type="text/javascript">
+                new TradingView.MediumWidget({
+                    "symbols": [["台股加權", "TWSE:TAIEX|1D"]],
+                    "chartOnly": false, "width": "100%", "height": 400, "locale": "zh_TW", "colorTheme": "light", "gridLineColor": "rgba(240, 243, 250, 0)", "fontColor": "#787B86", "isTransparent": false, "autosize": false, "container_id": "tv-twn"
+                });
+            </script>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">美股半導體與科技 (SOX / Nasdaq)</div>
+        <div class="tradingview-widget-container">
+            <div id="tv-us-tech"></div>
+            <script type="text/javascript">
+                new TradingView.MediumWidget({
+                    "symbols": [["費城半導體", "PHLX:SOX|1D"], ["那斯達克 100", "NASDAQ:NDX|1D"]],
+                    "chartOnly": false, "width": "100%", "height": 400, "locale": "zh_TW", "colorTheme": "light", "container_id": "tv-us-tech"
+                });
+            </script>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">領先指標：台積電 ADR (TSM)</div>
+        <div class="tradingview-widget-container">
+            <div id="tv-tsm"></div>
+            <script type="text/javascript">
+                new TradingView.MediumWidget({
+                    "symbols": [["台積電 ADR", "NYSE:TSM|1D"]],
+                    "chartOnly": false, "width": "100%", "height": 400, "locale": "zh_TW", "colorTheme": "light", "container_id": "tv-tsm"
+                });
+            </script>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">資金流向：美元 / 新台幣 (USDTWD)</div>
+        <div class="tradingview-widget-container">
+            <div id="tv-fx"></div>
+            <script type="text/javascript">
+                new TradingView.MediumWidget({
+                    "symbols": [["美元/台幣", "FX_IDC:USDTWD|1D"]],
+                    "chartOnly": false, "width": "100%", "height": 400, "locale": "zh_TW", "colorTheme": "light", "container_id": "tv-fx"
+                });
+            </script>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>數據由 TradingView 提供 | 2026 實時監測系統</p>
+</div>
+
+</body>
+</html>
