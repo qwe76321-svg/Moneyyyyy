@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 全球金融即時連動</title>
+    <title>2026 全球金融與台灣產業連動</title>
     <style>
         body { font-family: "Microsoft JhengHei", sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; }
         .header { text-align: center; margin-bottom: 30px; }
         .header h1 { color: #38bdf8; margin-bottom: 5px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
-        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 15px; height: 450px; }
-        .card-title { font-size: 1.1em; font-weight: bold; margin-bottom: 12px; color: #94a3b8; display: flex; align-items: center; }
-        .card-title::before { content: "●"; color: #38bdf8; margin-right: 8px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 15px; height: 480px; display: flex; flex-direction: column; }
+        .card-title { font-size: 1.05em; font-weight: bold; margin-bottom: 8px; color: #38bdf8; }
+        .industry-note { font-size: 0.85em; color: #94a3b8; margin-bottom: 12px; line-height: 1.4; border-bottom: 1px dashed #334155; padding-bottom: 10px; }
         footer { text-align: center; margin-top: 40px; color: #64748b; font-size: 0.8em; }
     </style>
 </head>
@@ -20,42 +20,38 @@
 
 <div class="container">
     <div class="header">
-        <h1>全球市場連動監控儀表板</h1>
-        <p>即時追蹤台股、美股與資金流向</p>
+        <h1>全球市場與台灣產業連動監控</h1>
+        <p>掌握國際指數對台灣核心產業的即時影響</p>
     </div>
 
     <div class="grid">
         <div class="card">
-            <div class="card-title">台股加權 (TAIEX)</div>
-            <div class="tradingview-widget-container" style="height:calc(100% - 32px)">
-                <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=TWSE%3ATAIEX&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
-            </div>
+            <div class="card-title">台股加權 (TAIEX)（台灣各產業綜合指標）</div>
+            <div class="industry-note">反映全台整體經濟，涵蓋半導體、金融、航運及塑化等所有產業的總體信心。</div>
+            <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=TWSE%3ATAIEX&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
         </div>
 
         <div class="card">
-            <div class="card-title">費城半導體 (SOX) - 產業領先指標</div>
-            <div class="tradingview-widget-container" style="height:calc(100% - 32px)">
-                <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=PHLX%3ASOX&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
-            </div>
+            <div class="card-title">費城半導體 (SOX)（台灣半導體產業連動）</div>
+            <div class="industry-note">直接影響台積電、聯發科、日月光等 IC 設計與封測龍頭走勢。</div>
+            <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=PHLX%3ASOX&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
         </div>
 
         <div class="card">
-            <div class="card-title">台積電 ADR (TSM) - 台股影子</div>
-            <div class="tradingview-widget-container" style="height:calc(100% - 32px)">
-                <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=NYSE%3ATSM&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
-            </div>
+            <div class="card-title">台積電 ADR (TSM)（台積電及其供應鏈）</div>
+            <div class="industry-note">台股領先指標，影響設備股（如弘塑、萬潤）與材料供應商的市場情緒。</div>
+            <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=NYSE%3ATSM&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
         </div>
 
         <div class="card">
-            <div class="card-title">美元 / 台幣 (USDTWD) - 資金流向</div>
-            <div class="tradingview-widget-container" style="height:calc(100% - 32px)">
-                <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=FX_IDC%3AUSDTWD&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
-            </div>
+            <div class="card-title">美元 / 台幣 (USDTWD)（電子與傳統出口產業）</div>
+            <div class="industry-note">影響外銷導向企業（如鴻海、廣達及機械工具機）的匯損與海外獲利折算。</div>
+            <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=FX_IDC%3AUSDTWD&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
         </div>
     </div>
 
     <footer>
-        數據由 TradingView 即時提供 | 系統環境：2026 市場觀察
+        數據來源：TradingView | 2026 投資分析工具
     </footer>
 </div>
 
