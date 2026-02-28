@@ -2,174 +2,147 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>3D 體型模擬器</title>
+    <title>3D 真人穿搭模擬器</title>
     <style>
-        body { margin: 0; display: flex; font-family: sans-serif; background: #2c3e50; color: white; }
-        #ui-panel { width: 300px; padding: 20px; background: rgba(0,0,0,0.8); z-index: 10; height: 100vh; box-sizing: border-box; }
-        #canvas-container { flex-grow: 1; height: 100vh; position: relative; }
-        .input-group { margin-bottom: 20px; }
-        select { width: 100%; padding: 10px; border-radius: 5px; margin-top: 5px; }
-        label { font-size: 14px; color: #bdc3c7; }
-        h2 { border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-        #bmi-info { margin-top: 30px; padding: 15px; background: #34495e; border-radius: 10px; text-align: center; }
+        body { margin: 0; font-family: 'PingFang TC', sans-serif; background: #1a1a1a; color: white; display: flex; }
+        #ui-panel { width: 320px; padding: 25px; background: #252525; box-shadow: 2px 0 15px rgba(0,0,0,0.5); z-index: 10; }
+        #canvas-container { flex-grow: 1; height: 100vh; }
+        .control-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #aaa; font-size: 14px; }
+        select { width: 100%; padding: 12px; background: #333; border: 1px solid #444; color: white; border-radius: 6px; }
+        h2 { font-weight: 300; border-bottom: 1px solid #444; padding-bottom: 15px; }
+        .loading-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #3498db; }
     </style>
 </head>
 <body>
 
 <div id="ui-panel">
-    <h2>3D 人物設定</h2>
+    <h2>人體特徵設定</h2>
     
-    <div class="input-group">
-        <label>性別</label>
+    <div class="control-group">
+        <label>性別選擇</label>
         <select id="gender">
-            <option value="male">男性 (寬肩)</option>
-            <option value="female">女性 (寬臀)</option>
+            <option value="female">女性 (Female)</option>
+            <option value="male">男性 (Male)</option>
         </select>
     </div>
 
-    <div class="input-group">
+    <div class="control-group">
         <label>身高 (cm)</label>
         <select id="height"></select>
     </div>
 
-    <div class="input-group">
+    <div class="control-group">
         <label>體重 (kg)</label>
         <select id="weight"></select>
     </div>
 
-    <div id="bmi-info">
-        <div>當前 BMI</div>
-        <div id="bmi-val" style="font-size: 24px; font-weight: bold; color: #2ecc71;">--</div>
+    <div style="margin-top: 40px; padding: 20px; background: #333; border-radius: 10px; text-align: center;">
+        <span style="font-size: 12px; color: #888;">當前體型參數</span>
+        <div id="status" style="font-size: 18px; color: #3498db; margin-top: 5px;">載入中...</div>
     </div>
-    
-    <p style="font-size: 12px; color: #7f8c8d; margin-top: 20px;">* 使用滑鼠左鍵旋轉、滾輪縮放</p>
 </div>
 
-<div id="canvas-container"></div>
+<div id="canvas-container">
+    <div id="loading" class="loading-overlay">正在初始化 3D 真人模型...</div>
+</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script type="module">
+    import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
+    import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
+    import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
 
-<script>
-    let scene, camera, renderer, character, torso, head, lArm, rArm, lLeg, rLeg, controls;
+    let scene, camera, renderer, model, controls;
+    let bones = {}; // 儲存骨骼引用
 
-    function init() {
-        // 1. 場景設定
+    async function init() {
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x2c3e50);
+        scene.background = new THREE.Color(0x1a1a1a);
 
-        // 2. 攝影機
-        camera = new THREE.PerspectiveCamera(45, (window.innerWidth - 300) / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 1.5, 4);
+        camera = new THREE.PerspectiveCamera(45, (window.innerWidth - 320) / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 1.2, 3);
 
-        // 3. 渲染器
         renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth - 300, window.innerHeight);
+        renderer.setSize(window.innerWidth - 320, window.innerHeight);
+        renderer.outputEncoding = THREE.sRGBEncoding;
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // 4. 燈光
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(1, 1, 2);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        // 光照 (模擬攝影棚效果)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+        const spotLight = new THREE.SpotLight(0xffffff, 0.8);
+        spotLight.position.set(5, 10, 5);
+        scene.add(spotLight);
 
-        // 5. 建立人物組合
-        character = new THREE.Group();
-        const mat = new THREE.MeshPhongMaterial({ color: 0xe0ac69 }); // 膚色
-
-        // 軀幹
-        torso = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 0.5), mat);
-        torso.position.y = 1.2;
-        character.add(torso);
-
-        // 頭部
-        head = new THREE.Mesh(new THREE.SphereGeometry(0.25, 32, 32), mat);
-        head.position.y = 2.1;
-        character.add(head);
-
-        // 手腳 (簡化呈現)
-        const limbGeo = new THREE.CylinderGeometry(0.1, 0.1, 1, 16);
-        lArm = new THREE.Mesh(limbGeo, mat); lArm.position.set(-0.6, 1.3, 0);
-        rArm = new THREE.Mesh(limbGeo, mat); rArm.position.set(0.6, 1.3, 0);
-        lLeg = new THREE.Mesh(limbGeo, mat); lLeg.position.set(-0.3, 0.5, 0);
-        rLeg = new THREE.Mesh(limbGeo, mat); rLeg.position.set(0.3, 0.5, 0);
+        // 載入模型 (這裡使用一個標準人體模型路徑，正式開發時請替換為你的 .glb 檔案)
+        const loader = new GLTFLoader();
+        // 範例使用一個通用的 Avatar 模型路徑
+        const modelUrl = 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/RobotExpressive/RobotExpressive.glb'; 
+        // 註：這是一個機器人模型作為演示，換成真人模型的 .glb 即可實現真人效果
         
-        character.add(lArm, rArm, lLeg, rLeg);
-        scene.add(character);
+        loader.load(modelUrl, (gltf) => {
+            model = gltf.scene;
+            model.scale.set(1, 1, 1);
+            scene.add(model);
+            
+            // 隱藏載入提示
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('status').innerText = '模型已就緒';
 
-        // 控制器
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
-        
-        // 初始化下拉選單
-        const hSelect = document.getElementById('height');
-        const wSelect = document.getElementById('weight');
-        for(let i=150; i<=180; i++) hSelect.add(new Option(i, i));
-        for(let i=40; i<=90; i++) wSelect.add(new Option(i, i));
-        hSelect.value = 165; wSelect.value = 60;
-
-        // 監聽事件
-        [hSelect, wSelect, document.getElementById('gender')].forEach(el => {
-            el.addEventListener('change', updateBody);
+            // 初始化選單
+            setupUI();
+            updateBody();
         });
 
-        window.addEventListener('resize', onWindowResize);
-        updateBody();
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(0, 1, 0);
         animate();
     }
 
+    function setupUI() {
+        const hSel = document.getElementById('height');
+        const wSel = document.getElementById('weight');
+        for(let i=150; i<=180; i++) hSel.add(new Option(`${i} cm`, i));
+        for(let i=40; i<=90; i++) wSel.add(new Option(`${i} kg`, i));
+        hSel.value = 165; wSel.value = 60;
+
+        [hSel, wSel, document.getElementById('gender')].forEach(el => {
+            el.addEventListener('change', updateBody);
+        });
+    }
+
     function updateBody() {
+        if (!model) return;
+
         const h = parseInt(document.getElementById('height').value);
         const w = parseInt(document.getElementById('weight').value);
-        const gender = document.getElementById('gender').value;
-
-        // 計算 BMI
-        const bmi = (w / ((h/100)**2)).toFixed(1);
-        document.getElementById('bmi-val').innerText = bmi;
-
-        // 基礎比例 (165cm, 60kg 為基準 1.0)
-        const hScale = h / 165;
-        const wScale = w / 60;
-
-        // 調整人物整體高度
-        character.scale.set(1, hScale, 1);
-
-        // 根據體重調整軀幹與四肢的粗細 (寬度與厚度)
-        // 考慮到體重增加不只是變寬，也會變厚
-        const thickness = Math.sqrt(wScale); 
-        torso.scale.set(thickness, 1, thickness);
         
-        // 性別特徵微調
-        if(gender === 'female') {
-            // 女性：肩膀稍窄，臀部加寬
-            torso.geometry = new THREE.CylinderGeometry(0.4 * thickness, 0.6 * thickness, 1.5, 4);
-            torso.rotation.y = Math.PI / 4; // 轉向正面
-        } else {
-            // 男性：倒三角形，肩膀寬
-            torso.geometry = new THREE.CylinderGeometry(0.6 * thickness, 0.4 * thickness, 1.5, 4);
-            torso.rotation.y = Math.PI / 4;
-        }
+        // 1. 身高變換 (整體縮放 Y 軸)
+        const heightScale = h / 170; // 以 170cm 為標準
+        model.scale.y = heightScale;
 
-        // 調整手腳粗細
-        [lArm, rArm, lLeg, rLeg].forEach(limb => {
-            limb.scale.set(thickness, 1, thickness);
-        });
+        // 2. 體型變換 (體重影響 X 與 Z 軸，即寬度與厚度)
+        // 這裡模擬體脂肪與肌肉增加的效果
+        const weightBase = w / 60; // 以 60kg 為標準
+        const thickness = Math.sqrt(weightBase); // 使用平方根讓增加幅度較自然
         
-        // 動態調整手的位置 (避免穿模)
-        lArm.position.x = -0.4 - (0.2 * thickness);
-        rArm.position.x = 0.4 + (0.2 * thickness);
+        model.scale.x = thickness;
+        model.scale.z = thickness;
+
+        document.getElementById('status').innerText = `${h}cm / ${w}kg`;
     }
 
     function animate() {
         requestAnimationFrame(animate);
-        controls.update();
+        if(controls) controls.update();
         renderer.render(scene, camera);
     }
 
-    function onWindowResize() {
-        camera.aspect = (window.innerWidth - 300) / window.innerHeight;
+    window.addEventListener('resize', () => {
+        camera.aspect = (window.innerWidth - 320) / window.innerHeight;
         camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth - 300, window.innerHeight);
-    }
+        renderer.setSize(window.innerWidth - 320, window.innerHeight);
+    });
 
     init();
 </script>
