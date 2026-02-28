@@ -4,145 +4,170 @@
     <meta charset="UTF-8">
     <title>3D 真人穿搭模擬器</title>
     <style>
-        body { margin: 0; font-family: 'PingFang TC', sans-serif; background: #1a1a1a; color: white; display: flex; }
-        #ui-panel { width: 320px; padding: 25px; background: #252525; box-shadow: 2px 0 15px rgba(0,0,0,0.5); z-index: 10; }
-        #canvas-container { flex-grow: 1; height: 100vh; }
-        .control-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #aaa; font-size: 14px; }
-        select { width: 100%; padding: 12px; background: #333; border: 1px solid #444; color: white; border-radius: 6px; }
-        h2 { font-weight: 300; border-bottom: 1px solid #444; padding-bottom: 15px; }
-        .loading-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #3498db; }
+        body { margin: 0; font-family: 'Microsoft JhengHei', sans-serif; background: #121212; color: white; display: flex; overflow: hidden; }
+        #ui-panel { width: 300px; padding: 20px; background: rgba(30, 30, 30, 0.9); box-shadow: 2px 0 20px rgba(0,0,0,0.5); z-index: 10; height: 100vh; }
+        #canvas-container { flex-grow: 1; height: 100vh; position: relative; }
+        .control-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 10px; color: #3498db; font-weight: bold; }
+        select { width: 100%; padding: 12px; background: #2c3e50; border: 1px solid #34495e; color: white; border-radius: 8px; cursor: pointer; outline: none; }
+        select:hover { border-color: #3498db; }
+        h2 { font-size: 1.2rem; border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 30px; }
+        .info { font-size: 0.8rem; color: #888; line-height: 1.6; }
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #3498db; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
 <div id="ui-panel">
-    <h2>人體特徵設定</h2>
+    <h2>人物基礎設定</h2>
     
     <div class="control-group">
-        <label>性別選擇</label>
+        <label>性別 (Gender)</label>
         <select id="gender">
-            <option value="female">女性 (Female)</option>
-            <option value="male">男性 (Male)</option>
+            <option value="male">男性 (更換為男性模型)</option>
+            <option value="female" selected>女性 (更換為女性模型)</option>
         </select>
     </div>
 
     <div class="control-group">
-        <label>身高 (cm)</label>
+        <label>身高 (Height)</label>
         <select id="height"></select>
     </div>
 
     <div class="control-group">
-        <label>體重 (kg)</label>
+        <label>體重 (Weight)</label>
         <select id="weight"></select>
     </div>
 
-    <div style="margin-top: 40px; padding: 20px; background: #333; border-radius: 10px; text-align: center;">
-        <span style="font-size: 12px; color: #888;">當前體型參數</span>
-        <div id="status" style="font-size: 18px; color: #3498db; margin-top: 5px;">載入中...</div>
+    <div class="info">
+        <p>💡 操作說明：<br>
+        - 滑鼠左鍵：旋轉人物<br>
+        - 滑鼠滾輪：縮放視角<br>
+        - 滑鼠右鍵：移動位置</p>
     </div>
 </div>
 
 <div id="canvas-container">
-    <div id="loading" class="loading-overlay">正在初始化 3D 真人模型...</div>
+    <div id="loading">正在生成 3D 模擬人物...</div>
 </div>
 
 <script type="module">
-    import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
-    import { OrbitControls } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/controls/OrbitControls.js';
-    import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
+    import * as THREE from 'https://cdn.skypack.dev/three@0.136.0';
+    import { OrbitControls } from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js';
+    import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js';
 
     let scene, camera, renderer, model, controls;
-    let bones = {}; // 儲存骨骼引用
+    const loader = new GLTFLoader();
+
+    // 模型網址 (這裡使用一個公用的真人比例模型作為展示)
+    // 之後你可以換成自己的 "barbie.glb" 或 "avatar.glb"
+    const MODELS = {
+        female: 'https://threejs.org/examples/models/gltf/Michelle.glb',
+        male: 'https://threejs.org/examples/models/gltf/Soldier.glb'
+    };
 
     async function init() {
+        // 1. 初始化場景
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1a1a1a);
+        scene.background = new THREE.Color(0x121212);
 
-        camera = new THREE.PerspectiveCamera(45, (window.innerWidth - 320) / window.innerHeight, 0.1, 1000);
+        // 2. 初始化相機
+        camera = new THREE.PerspectiveCamera(45, (window.innerWidth - 300) / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 1.2, 3);
 
+        // 3. 初始化渲染器
         renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth - 320, window.innerHeight);
+        renderer.setSize(window.innerWidth - 300, window.innerHeight);
         renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.shadowMap.enabled = true;
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // 光照 (模擬攝影棚效果)
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-        scene.add(ambientLight);
-        const spotLight = new THREE.SpotLight(0xffffff, 0.8);
-        spotLight.position.set(5, 10, 5);
-        scene.add(spotLight);
+        // 4. 光照環境 (模擬人像攝影棚)
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
+        scene.add(hemiLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(3, 10, 10);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
 
-        // 載入模型 (這裡使用一個標準人體模型路徑，正式開發時請替換為你的 .glb 檔案)
-        const loader = new GLTFLoader();
-        // 範例使用一個通用的 Avatar 模型路徑
-        const modelUrl = 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/RobotExpressive/RobotExpressive.glb'; 
-        // 註：這是一個機器人模型作為演示，換成真人模型的 .glb 即可實現真人效果
-        
-        loader.load(modelUrl, (gltf) => {
-            model = gltf.scene;
-            model.scale.set(1, 1, 1);
-            scene.add(model);
-            
-            // 隱藏載入提示
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('status').innerText = '模型已就緒';
-
-            // 初始化選單
-            setupUI();
-            updateBody();
-        });
-
+        // 5. 軌道控制 (旋轉檢視)
         controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
         controls.target.set(0, 1, 0);
+
+        // 6. 初始化選單
+        setupDropdowns();
+        
+        // 7. 載入預設模型
+        loadCharacter('female');
+
+        window.addEventListener('resize', onWindowResize);
         animate();
     }
 
-    function setupUI() {
+    function setupDropdowns() {
         const hSel = document.getElementById('height');
         const wSel = document.getElementById('weight');
+        const gSel = document.getElementById('gender');
+
         for(let i=150; i<=180; i++) hSel.add(new Option(`${i} cm`, i));
         for(let i=40; i<=90; i++) wSel.add(new Option(`${i} kg`, i));
-        hSel.value = 165; wSel.value = 60;
+        
+        hSel.value = 165;
+        wSel.value = 55;
 
-        [hSel, wSel, document.getElementById('gender')].forEach(el => {
-            el.addEventListener('change', updateBody);
+        hSel.addEventListener('change', updateBodyShape);
+        wSel.addEventListener('change', updateBodyShape);
+        gSel.addEventListener('change', (e) => loadCharacter(e.target.value));
+    }
+
+    function loadCharacter(gender) {
+        if (model) scene.remove(model);
+        document.getElementById('loading').style.display = 'block';
+
+        loader.load(MODELS[gender], (gltf) => {
+            model = gltf.scene;
+            model.traverse(n => { if (n.isMesh) n.castShadow = true; });
+            scene.add(model);
+            document.getElementById('loading').style.display = 'none';
+            updateBodyShape(); // 載入後立即套用當前數值
         });
     }
 
-    function updateBody() {
+    function updateBodyShape() {
         if (!model) return;
 
-        const h = parseInt(document.getElementById('height').value);
-        const w = parseInt(document.getElementById('weight').value);
-        
-        // 1. 身高變換 (整體縮放 Y 軸)
-        const heightScale = h / 170; // 以 170cm 為標準
-        model.scale.y = heightScale;
+        const heightVal = parseInt(document.getElementById('height').value);
+        const weightVal = parseInt(document.getElementById('weight').value);
 
-        // 2. 體型變換 (體重影響 X 與 Z 軸，即寬度與厚度)
-        // 這裡模擬體脂肪與肌肉增加的效果
-        const weightBase = w / 60; // 以 60kg 為標準
-        const thickness = Math.sqrt(weightBase); // 使用平方根讓增加幅度較自然
-        
-        model.scale.x = thickness;
-        model.scale.z = thickness;
+        // --- 核心縮放演算法 ---
+        // 1. 身高 (Height): 影響 Y 軸
+        // 基準設為 170cm = 1.0
+        const scaleY = heightVal / 170;
 
-        document.getElementById('status').innerText = `${h}cm / ${w}kg`;
+        // 2. 體重 (Weight): 影響 X 軸(寬度) 與 Z 軸(厚度)
+        // 基準設為 60kg = 1.0
+        // 我們使用 Math.sqrt (平方根) 讓體重增加時的視覺效果比較自然，不會過度膨脹
+        const scaleXZ = Math.sqrt(weightVal / 60);
+
+        // 套用縮放
+        model.scale.set(scaleXZ, scaleY, scaleXZ);
+        
+        // 同步調整模型位置，確保腳踩在地面上 (根據縮放比例微調)
+        model.position.y = 0; 
+    }
+
+    function onWindowResize() {
+        camera.aspect = (window.innerWidth - 300) / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth - 300, window.innerHeight);
     }
 
     function animate() {
         requestAnimationFrame(animate);
-        if(controls) controls.update();
+        controls.update();
         renderer.render(scene, camera);
     }
-
-    window.addEventListener('resize', () => {
-        camera.aspect = (window.innerWidth - 320) / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth - 320, window.innerHeight);
-    });
 
     init();
 </script>
