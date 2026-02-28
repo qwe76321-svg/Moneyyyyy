@@ -3,89 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 衛星通訊與全球航太連動監控</title>
+    <title>AI 穿搭模擬器 - 人物設定</title>
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #020617; color: #f8fafc; margin: 0; padding: 0; }
-        .ticker-container { height: 40px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; z-index: 100; background: #020617; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; margin: 20px 0 40px; }
-        .header h1 { color: #38bdf8; margin-bottom: 5px; font-size: 2em; letter-spacing: 2px; }
-        .header p { color: #94a3b8; font-size: 0.9em; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
-        .card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 15px; height: 520px; display: flex; flex-direction: column; }
-        .card:hover { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
-        .card-title { font-size: 1.1em; font-weight: bold; margin-bottom: 8px; color: #38bdf8; }
-        .industry-note { font-size: 0.85em; color: #94a3b8; margin-bottom: 15px; line-height: 1.5; background: #1e293b; padding: 10px; border-radius: 6px; flex-shrink: 0; }
-        footer { text-align: center; margin-top: 50px; padding: 20px; color: #475569; font-size: 0.8em; border-top: 1px solid #1e293b; }
-        .tag { background: #0369a1; color: #e0f2fe; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; margin-right: 5px; }
-        .tag-space { background: #7c3aed; color: #f5f3ff; } /* 衛星專屬色 */
+        :root {
+            --primary-color: #6c5ce7;
+            --bg-color: #f0f2f5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 40px;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        /* 左側控制面板 */
+        .controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h2 { color: var(--primary-color); margin-top: 0; }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label { font-weight: bold; color: #444; }
+
+        select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        select:focus { border-color: var(--primary-color); }
+
+        /* 右側預覽區域 */
+        .preview-area {
+            flex: 1;
+            background: #f9f9f9;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            position: relative;
+        }
+
+        #character-svg {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
+        }
+
+        .stats-display {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #666;
+        }
+
     </style>
 </head>
 <body>
 
-<div class="ticker-container">
-    <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-        {
-        "symbols": [
-            {"proName": "BATS:ARKX", "title": "ARK太空探索ETF"},
-            {"proName": "TWSE:3491", "title": "昇達科"},
-            {"proName": "TWSE:2313", "title": "華通"},
-            {"proName": "TWSE:6274", "title": "台耀"},
-            {"proName": "TWSE:2634", "title": "漢翔"},
-            {"proName": "TWSE:TAIEX", "title": "台股加權"}
-        ],
-        "showSymbolLogo": true, "colorTheme": "dark", "isTransparent": true, "displayMode": "adaptive", "locale": "zh_TW"
-        }
-        </script>
-    </div>
-</div>
-
 <div class="container">
-    <div class="header">
-        <h1>低軌衛星與全球航太產業戰情室</h1>
-        <p>追蹤 SpaceX、Amazon Kuiper 供應鏈與台股衛星板塊</p>
-    </div>
-
-    <div class="grid">
-        <div class="card">
-            <div class="card-title">ARK 太空探索與創新 ETF (ARKX)（全球衛星與航太指標）</div>
-            <div class="industry-note">
-                <span class="tag tag-space">全球領先</span> 包含衛星通訊、軌道科技與零組件。當 ARKX 走強，代表全球資金對 <b>低軌衛星布建</b> 與 <b>6G 預研</b> 的認同度提升。
-            </div>
-            <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=BATS%3AARKX&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
+    <div class="controls">
+        <h2>人物基礎設定</h2>
+        
+        <div class="input-group">
+            <label for="gender">性別</label>
+            <select id="gender">
+                <option value="male">男 (Male)</option>
+                <option value="female">女 (Female)</option>
+            </select>
         </div>
 
-        <div class="card">
-            <div class="card-title">昇達科 (3491)（衛星射頻與微波元件）</div>
-            <div class="industry-note">
-                <span class="tag tag-space">衛星核心</span> 台灣低軌衛星純度最高個股。主要供應 <b>微波/毫米波天線元件</b>，與 SpaceX Starlink、Eutelsat OneWeb 具備高度相關性。
-            </div>
-            <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=TWSE%3A3491&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
+        <div class="input-group">
+            <label for="height">身高 (cm)</label>
+            <select id="height"></select>
         </div>
 
-        <div class="card">
-            <div class="card-title">華通 (2313)（低軌衛星板與 HDI 指標）</div>
-            <div class="industry-note">
-                <span class="tag tag-space">關鍵板材</span> SpaceX 衛星與地面站 <b>HDI 板</b> 的主要供應商。其營收占比直接反映衛星客戶的拉貨力道。
-            </div>
-            <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=TWSE%3A2313&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
-        </div>
-
-        <div class="card">
-            <div class="card-title">漢翔 (2634)（國防、航太與衛星結構件）</div>
-            <div class="industry-note">
-                <span class="tag tag-space">航太結構</span> 反映台灣 <b>航太工業</b> 與 <b>軍民通用衛星載體</b> 的發展，與波音、空中巴士及全球衛星發射頻率正相關。
-            </div>
-            <iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://www.tradingview-widget.com/embed-widget/symbol-overview/?symbol=TWSE%3A2634&colorTheme=dark&isTransparent=true&locale=zh_TW" style="width:100%; height:100%;"></iframe>
+        <div class="input-group">
+            <label for="weight">體重 (kg)</label>
+            <select id="weight"></select>
         </div>
     </div>
 
-    <footer>
-        2026 衛星產業即時監測 | 數據由 TradingView 提供 | 指標含括：Starlink、Amazon Kuiper 台灣供應鏈
-    </footer>
+    <div class="preview-area">
+        <svg id="character-svg" width="200" height="400" viewBox="0 0 100 200">
+            <g id="body-shape" fill="#e0e0e0" stroke="#333" stroke-width="2">
+                <path id="body-path" d="" />
+                <circle id="head" cx="50" cy="30" r="15" />
+            </g>
+        </svg>
+        <div class="stats-display" id="stats-text">BMI: --</div>
+    </div>
 </div>
+
+<script>
+    const genderSelect = document.getElementById('gender');
+    const heightSelect = document.getElementById('height');
+    const weightSelect = document.getElementById('weight');
+    const bodyPath = document.getElementById('body-path');
+    const head = document.getElementById('head');
+    const statsText = document.getElementById('stats-text');
+
+    // 初始化選單內容
+    function initOptions() {
+        for (let i = 150; i <= 180; i++) {
+            let opt = new Option(`${i} cm`, i);
+            if (i === 165) opt.selected = true;
+            heightSelect.add(opt);
+        }
+        for (let i = 40; i <= 90; i++) {
+            let opt = new Option(`${i} kg`, i);
+            if (i === 65) opt.selected = true;
+            weightSelect.add(opt);
+        }
+    }
+
+    // 更新人物外觀的邏輯
+    function updateCharacter() {
+        const gender = genderSelect.value;
+        const h = parseInt(heightSelect.value);
+        const w = parseInt(weightSelect.value);
+
+        // 計算縮放比例 (以 165cm/65kg 為基準)
+        const heightScale = h / 165;
+        const widthScale = w / 65;
+
+        // 計算 BMI 顯示
+        const bmi = (w / ((h/100)**2)).toFixed(1);
+        statsText.innerText = `身高: ${h}cm | 體重: ${w}kg | BMI: ${bmi}`;
+
+        // 根據性別與體型繪製不同的 Path
+        let d = "";
+        const centerX = 50;
+        const baseY = 180 * heightScale;
+        const bodyW = 20 * widthScale; // 軀幹寬度
+        const shoulderW = gender === 'male' ? 30 * widthScale : 22 * widthScale; // 男生肩膀較寬
+        const hipW = gender === 'female' ? 28 * widthScale : 22 * widthScale;   // 女生臀部較寬
+
+        // 繪製一個簡易的人物軀幹
+        d = `M ${centerX - shoulderW},60 
+             L ${centerX + shoulderW},60 
+             L ${centerX + hipW},120 
+             L ${centerX - hipW},120 Z`;
+
+        bodyPath.setAttribute('d', d);
+        
+        // 調整頭部位置與大小 (隨身高上下移動)
+        head.setAttribute('cy', 60 - (25)); 
+        
+        // 整體 SVG 縮放效果
+        const svgElement = document.getElementById('character-svg');
+        svgElement.style.transform = `scale(${0.8 + (heightScale * 0.2)})`;
+    }
+
+    // 監聽變化
+    [genderSelect, heightSelect, weightSelect].forEach(el => {
+        el.addEventListener('change', updateCharacter);
+    });
+
+    // 啟動
+    initOptions();
+    updateCharacter();
+</script>
 
 </body>
 </html>
